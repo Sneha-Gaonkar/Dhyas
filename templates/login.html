@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Login</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f9f9f9;
+        }
+
+        .gradient-button {
+            background: linear-gradient(to right, red, #ffd000);
+            border: none;
+        }
+
+        .gradient-button:hover {
+            background-color: #45a049;
+        }
+
+        .signup-link {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 14px;
+            color: rgb(18, 18, 247);
+        }
+
+        .error-message {
+            color: red;
+        }
+
+        .container {
+            position: relative; /* Needed for absolute positioning of signup link */
+        }
+
+        #captcha {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            background-color: #f2f2f2;
+            padding: 10px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        #captchaInput {
+            margin-bottom: 15px; /* Added margin to separate from button */
+        }
+
+        #result {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body class="d-flex align-items-center justify-content-center vh-100" oncontextmenu="return false;">
+    <div class="container p-4 bg-white rounded shadow" style="max-width: 300px;">
+        <a href="{{ url_for('signup') }}" class="signup-link">Sign Up</a>
+        <h2 class="text-center mb-4">Login</h2>
+        {% if error_message %}
+            <p class="error-message text-center">{{ error_message }}</p>
+        {% endif %}
+        <form id="loginForm" action="/login" method="post">
+            <div class="mb-3">
+                <input type="text" name="username" placeholder="Username" required class="form-control">
+            </div>
+            <div class="mb-3">
+                <input type="password" name="password" placeholder="Password" required class="form-control">
+            </div>
+            <div id="captcha"></div>
+            <input type="text" id="captchaInput" placeholder="Enter CAPTCHA" class="form-control">
+            <button type="button" onclick="validateCaptcha()" class="btn gradient-button w-100 mt-3">Login</button>
+            <p id="result"></p>
+        </form>
+    </div>
+
+    <script>
+
+        // Function to generate random CAPTCHA text
+        function generateCaptcha(length) {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let captchaText = '';
+            for (let i = 0; i < length; i++) {
+                captchaText += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return captchaText;
+        }
+
+        // Function to display CAPTCHA
+        function displayCaptcha() {
+            const captchaText = generateCaptcha(6);
+            document.getElementById('captcha').innerText = captchaText;
+            document.getElementById('captcha').setAttribute('data-captcha', captchaText);
+        }
+
+        // Function to validate CAPTCHA
+        function validateCaptcha() {
+            const userInput = document.getElementById('captchaInput').value;
+            const captchaText = document.getElementById('captcha').getAttribute('data-captcha');
+            const resultElement = document.getElementById('result');
+
+            if (userInput === captchaText) {
+                resultElement.innerText = 'CAPTCHA validation successful!';
+                resultElement.style.color = 'green';
+                document.getElementById('loginForm').submit(); // Submit the form if CAPTCHA is correct
+            } else {
+                resultElement.innerText = 'CAPTCHA validation failed. Please try again.';
+                resultElement.style.color = 'red';
+                displayCaptcha(); // Refresh the CAPTCHA
+            }
+        }
+
+        // Initial CAPTCHA display
+        displayCaptcha();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

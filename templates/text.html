@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Updated Data</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .btn-custom {
+            background-color: #FF4500;
+            color: white;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: darkorange;
+        }
+        @media print {
+            .btn-custom, .whatsapp-btn, .whatsapp-call-btn, .print-btn {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="container mt-4" oncontextmenu="return false;">
+    <div class="message p-3 mb-4 bg-light border">
+        <div class="row mb-3">
+            <div class="col-12 d-flex justify-content-between">
+                <div>
+                    <button class="btn btn-custom" onclick="home()">Home</button>
+                    <button class="btn btn-custom d-none d-md-inline-block" onclick="back()">Back</button>
+                    <button class="btn btn-custom d-none d-md-inline-block" onclick="next()">Next</button>
+                </div>
+                <button class="btn btn-custom" onclick="logout()">Logout</button>
+            </div>
+        </div>
+        <div id="google_translate_element"></div>
+        <h1 class="mb-4">Updated Data</h1>
+
+        <img src="../images/image1.png" alt="Your Image" class="img-fluid mb-4">
+<!--        <ul class="list-unstyled">-->
+<!--            <li><span class="font-weight-bold">Constituency:</span> <span>{{ updated_data['Constituency'] }}</span></li>-->
+<!--            <li><span class="font-weight-bold">Section_No_and_Name:</span> <span>{{ updated_data['Section_No_and_Name'] }}</span></li>-->
+<!--            <li><span class="font-weight-bold">No_and_Name_of_Polling_Station:</span> <span>{{ updated_data['No_and_Name_of_Polling_Station'] }}</span></li>-->
+<!--            <li><span class="font-weight-bold">Address_of_Polling_Station:</span> <span>{{ updated_data['Address_of_Polling_Station'] }}</span></li>-->
+<!--            <li><span class="font-weight-bold">Part_SNo:</span> <span>{{ updated_data['Part_SNo'] }}</span></li>-->
+<!--            <li><span class="font-weight-bold">Relative_Name:</span> <span>{{ updated_data['Relative_Name'] }}</span></li>-->
+<!--            <li><span class="font-weight-bold">Surname:</span> <span>{{ updated_data['Surname'] }}</span></li>-->
+<!--            <li><span class="font-weight-bold">Relation:</span> <span>{{ updated_data['Relation'] }}</span></li>-->
+<!--            <li><span class="font-weight-bold">Age:</span> <span>{{ updated_data['Age'] }}</span></li>-->
+<!--            <li><span class="font-weight-bold">Gender:</span> <span>{{ updated_data['Gender'] }}</span></li>-->
+<!--            <li><span class="font-weight-bold">House_No:</span> <span>{{ updated_data['House_No'] }}</span></li>-->
+<!--            <li><span class="font-weight-bold">EPIC_No:</span> <span>{{ updated_data['EPIC_No'] }}</span></li>-->
+<!--            <li><span class="font-weight-bold">Original_OCR:</span> <span>{{ updated_data['Original_OCR'] }}</span></li>-->
+<!--        </ul>-->
+       <ul class="list-unstyled">
+            {% for column in ['Constituency', 'Section_No_and_Name', 'No_and_Name_of_Polling_Station', 'Address_of_Polling_Station', 'Part_SNo', 'Relative_Name', 'Surname', 'Relation', 'Age', 'Gender', 'House_No', 'EPIC_No'] %}
+                <li>
+                    <span class="font-weight-bold">{{ column.replace('_', ' ') }}:</span>
+                    <span>{{ updated_data[column] }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="text-center mb-4">
+        <a href="#" class="whatsapp-btn mr-2">
+            <img src="../images/WhatsApp.svg.webp" alt="WhatsApp Icon" width="40" height="40">
+        </a>
+        <a href="#" onclick="window.print(); return false;" class="print-btn mr-2">
+            <img src="../images/printer.png" alt="Printer Icon" width="45" height="45">
+        </a>
+        <a href="#" class="whatsapp-call-btn">
+            <img src="../images/call.png" alt="Call Icon" width="40" height="40">
+        </a>
+    </div>
+
+    <script>
+        function sendWhatsAppMessage() {
+            const phoneNumber = "{{ updated_data['phone_number'] }}";
+            if (phoneNumber) {
+                const liElements = document.querySelectorAll('.message li');
+                const details = [];
+                liElements.forEach(li => {
+                    const labelElement = li.querySelector('.font-weight-bold');
+                    const valueElement = li.querySelector('span:last-child');
+                    if (labelElement && valueElement) {
+                        const label = labelElement.textContent.trim().replace(':', '');
+                        const value = valueElement.textContent.trim();
+                        details.push(`${label}: ${value}`);
+                    }
+                });
+
+                let message = details.join('\n');
+
+                const whatsappLink = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+                window.open(whatsappLink, '_blank');
+            } else {
+                alert('Phone number not found in details.');
+            }
+        }
+
+        // Function to initiate WhatsApp voice call
+        function initiateWhatsAppCall() {
+            // Get the phone number from the updated data
+            const phoneNumber = "{{ updated_data['phone_number'] }}"; // Assuming 'phone_number' is the key for the phone number
+
+            if (phoneNumber) {
+                // Construct the WhatsApp call link
+                const whatsappCallLink = `https://wa.me/${phoneNumber}?text=Hi&source=web`; // Directly start the call
+
+                // Open WhatsApp call link in the same tab
+                window.location.href = whatsappCallLink;
+            } else {
+                alert('Phone number not found in details.');
+            }
+        }
+
+
+        document.querySelector('.whatsapp-btn').addEventListener('click', sendWhatsAppMessage);
+        document.querySelector('.whatsapp-call-btn').addEventListener('click', initiateWhatsAppCall);
+
+        function logout() {
+            window.location.href = "/";
+        }
+
+        function home() {
+            window.location.href = "/display_index";
+        }
+
+        function back() {
+            history.back();
+        }
+
+        function next() {
+            history.forward();
+        }
+
+     function googleTranslateElementInit() {
+    var preferredLanguage = localStorage.getItem('preferredLanguage') || 'en'; // Default to English if not set
+    new google.translate.TranslateElement(
+        { pageLanguage: preferredLanguage },
+        'google_translate_element'
+    );
+}
+
+    </script>
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

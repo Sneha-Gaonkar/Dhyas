@@ -1,0 +1,125 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin List</title>
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body {
+                background-color: #f4f4f9;
+                padding: 20px;
+            }
+            .container {
+                max-width: 800px;
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            .header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            th, td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+            th {
+                background-color: #f8f8f8;
+            }
+            .clickable-row {
+                cursor: pointer;
+            }
+            .btn-custom {
+                background-color: #FF4500;
+                color: white;
+                border: none;
+                transition: background-color 0.3s;
+                margin-right: 10px;
+            }
+            .btn-custom:hover {
+                background-color: darkorange;
+            }
+        </style>
+    </head>
+    <body oncontextmenu="return false;">
+        <div class="container">
+            <div class="header">
+                <h1 class="mb-4">Admin List</h1>
+                <p>Click on a row to get data access.</p>
+            </div>
+            <div class="col-12 d-flex justify-content-between">
+                <div>
+                    <button class="btn btn-custom" onclick="home()">Home</button>
+                    <button class="btn btn-custom d-none d-md-inline-block" onclick="back()">Back</button>
+                    <button class="btn btn-custom d-none d-md-inline-block" onclick="next()">Next</button>
+                </div>
+                <button class="btn btn-custom" onclick="logout()">Logout</button>
+            </div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Election Type</th>
+                        <th>Constituency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for admin in admin_data %}
+                    <tr class="clickable-row" data-username="{{ admin.username }}" data-database-name="{{ admin.database_name }}" data-table-name="{{ admin.table_name }}">
+                        <td>{{ admin.username }}</td>
+                        <td>{{ admin.database_name }}</td>
+                        <td>{{ admin.table_name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                document.querySelectorAll('.clickable-row').forEach(row => {
+                    row.addEventListener('click', () => {
+                        const username = row.getAttribute('data-username');
+                        const databaseName = row.getAttribute('data-database-name');
+                        const tableName = row.getAttribute('data-table-name');
+                        const url = new URL('{{ url_for("display_index") }}', window.location.origin);
+                        url.searchParams.append('username', username);
+                        url.searchParams.append('database_name', databaseName);
+                        url.searchParams.append('table_name', tableName);
+                        window.location.href = url;
+                    });
+                });
+            });
+
+            function logout() {
+                window.location.href = "/";
+            }
+
+            function home() {
+                window.location.href = "/sunelperadminpa";
+            }
+
+            function back() {
+                history.back();
+            }
+
+            function next() {
+                history.forward();
+            }
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+    </body>
+    </html>

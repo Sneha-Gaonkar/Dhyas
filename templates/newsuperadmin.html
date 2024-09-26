@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Superadmin </title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        h1, p {
+            text-align: center;
+            color: #333;
+        }
+        .btn-custom {
+            background-color: #FF4500;
+            color: white;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: darkorange;
+        }
+        .link-left, .link-right {
+            position: absolute;
+            top: 10px;
+            font-size: 14px;
+            color: rgb(18, 18, 247);
+        }
+        .link-left {
+            left: 10px;
+        }
+        .link-right {
+            right: 10px;
+        }
+        .success-message {
+            color: green;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .btn-red {
+            background-color: #f44336; /* Red color */
+            color: white;
+        }
+        .btn-red:hover {
+            background-color: darken(#f44336, 10%);
+        }
+        .gradient-button {
+            background: linear-gradient(to right, red, #ffd000);
+            border: none;
+        }
+        .gradient-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+    <div class="container">
+<!--        <a href="{{ url_for('view_superadmin') }}" class="link-left">Superadmin List</a>-->
+<!--        <a href="{{ url_for('view_superadmin_admin') }}" class="link-right">Admin List</a>-->
+         <a href="{{ url_for('view_admin') }}" class="link-right">Admin List</a>
+        <br>
+        <div class="col-12 d-flex justify-content-between">
+            <div>
+<!--                <button class="btn btn-custom" onclick="home()">Home</button>-->
+                <button class="btn btn-custom d-none d-md-inline-block" onclick="back()">Back</button>
+                <button class="btn btn-custom d-none d-md-inline-block" onclick="next()">Next</button>
+            </div>
+            <button class="btn btn-custom" onclick="logout()">Logout</button>
+        </div>
+        <h1>Welcome to the Super Admin Panel</h1>
+        <p>Here you can manage the system with Main Admin privileges.</p>
+
+        <h2 class="text-center mb-4">Create Admin</h2>
+
+        {% if error_message %}
+            <p class="error-message">{{ error_message }}</p>
+        {% endif %}
+
+        {% if success_message %}
+            <p class="success-message">{{ success_message }}</p>
+        {% endif %}
+
+         <form id="signup-form" action="/createadmin_access" method="post">
+            <div class="mb-3">
+                <input type="text" name="username" placeholder="Username" required class="form-control">
+            </div>
+            <div class="mb-3">
+                <input type="password" name="password" placeholder="Password" required class="form-control">
+            </div>
+            <div class="mb-3">
+                <input type="email" name="email" placeholder="Email" required class="form-control">
+            </div>
+            <div class="mb-3">
+                <select id="database_name" name="database_name" class="form-control" required>
+                    <option value="" disabled selected>Select Election Type</option>
+                </select>
+            </div>
+            <div class="mb-3 d-none" id="sub_dropdown_container">
+                <select id="sub_database_name" name="sub_database_name" class="form-control">
+                    <option value="" disabled selected>Select Sub Election Type</option>
+                    <option value="Teachers">Teachers</option>
+                    <option value="Graduates">Graduates</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <select id="table_name" name="table_name" class="form-control" required>
+                    <option value="" disabled selected>Select Constituency</option>
+                </select>
+            </div>
+            <input type="submit" value="Create Admin Access" class="btn gradient-button mt-4 w-100">
+        </form>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/get_databases')
+                .then(response => response.json())
+                .then(databases => {
+                    const databaseSelect = document.getElementById('database_name');
+                    databases.forEach(database => {
+                        if (['Lok_Sabha', 'Vidhan_Sabha', 'Zilla_Parishad', 'Nagar_Parishad', 'Nagar_Palika', 'Vidhan_Parishad'].includes(database)) {
+                            const option = document.createElement('option');
+                            option.value = database;
+                            option.textContent = database;
+                            databaseSelect.appendChild(option);
+                        }
+                    });
+                });
+
+            document.getElementById('database_name').addEventListener('change', function() {
+                const selectedDatabase = this.value;
+                const subDropdownContainer = document.getElementById('sub_dropdown_container');
+
+                if (selectedDatabase === 'Vidhan_Parishad') {
+                    subDropdownContainer.classList.remove('d-none');
+                } else {
+                    subDropdownContainer.classList.add('d-none');
+                }
+
+                const fetchURL = selectedDatabase === 'Vidhan_Parishad'
+                    ? `/get_tables/${document.getElementById('sub_database_name').value}`
+                    : `/get_tables/${selectedDatabase}`;
+
+                fetch(fetchURL)
+                    .then(response => response.json())
+                    .then(tables => {
+                        const tableSelect = document.getElementById('table_name');
+                        tableSelect.innerHTML = '<option value="" disabled selected>Select Constituency</option>';
+                        tables.forEach(table => {
+                            const option = document.createElement('option');
+                            option.value = table;
+                            option.textContent = table;
+                            tableSelect.appendChild(option);
+                        });
+                    });
+            });
+
+            document.getElementById('sub_database_name').addEventListener('change', function() {
+                const selectedSubDatabase = this.value;
+                fetch(`/get_tables/${selectedSubDatabase}`)
+                    .then(response => response.json())
+                    .then(tables => {
+                        const tableSelect = document.getElementById('table_name');
+                        tableSelect.innerHTML = '<option value="" disabled selected>Select Constituency</option>';
+                        tables.forEach(table => {
+                            const option = document.createElement('option');
+                            option.value = table;
+                            option.textContent = table;
+                            tableSelect.appendChild(option);
+                        });
+                    });
+            });
+        });
+
+        function logout() {
+            window.location.href = "/";
+        }
+
+        function home() {
+            window.location.href = "/superadminpanel";
+        }
+
+        function back() {
+            history.back();
+        }
+
+        function next() {
+            history.forward();
+        }
+
+
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superadmin Panel</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        h1, p {
+            text-align: center;
+            color: #333;
+        }
+        .btn-custom {
+            background-color: #FF4500;
+            color: white;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: darkorange;
+        }
+        .link-left, .link-right {
+            position: absolute;
+            top: 10px;
+            font-size: 14px;
+            color: rgb(18, 18, 247);
+        }
+        .link-left {
+            left: 10px;
+        }
+        .link-right {
+            right: 10px;
+        }
+        .success-message {
+            color: green;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
+        #sub-election-type {
+            display: none; /* Hide the sub-election dropdown initially */
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+    <div class="container">
+        <a href="{{ url_for('createadmin_access') }}" class="link-left">Create Admin Access</a>
+        <a href="{{ url_for('view_admin') }}" class="link-right">Admin List</a>
+        <br>
+        <div class="col-12 d-flex justify-content-between">
+            <div>
+<!--                <button class="btn btn-custom" onclick="home()">Home</button>-->
+                <button class="btn btn-custom d-none d-md-inline-block" onclick="back()">Back</button>
+                <button class="btn btn-custom d-none d-md-inline-block" onclick="next()">Next</button>
+            </div>
+            <button class="btn btn-custom" onclick="logout()">Logout</button>
+        </div>
+        <h1>Welcome to the Superadmin Panel</h1>
+        <p>Here you can manage the system with superadmin privileges.</p>
+
+        <!-- Display flashed messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'error' %}
+                    <div class="error-message">{{ message }}</div>
+                {% else %}
+                    <div class="success-message">{{ message }}</div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="database">Select Election Type:</label>
+                <select name="database" id="database" class="form-control" required onchange="toggleSubElectionDropdown()">
+                    {% for db in databases %}
+                    <option value="{{ db }}">{{ db }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group" id="sub-election-type">
+                <label for="sub_database">Select Sub-Election Type:</label>
+                <select name="sub_database" id="sub_database" class="form-control">
+                    <option value="Teachers">Teachers</option>
+                    <option value="Graduates">Graduates</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="file">Upload File (.xls, .xlsx, .csv):</label>
+                <input type="file" name="file" id="file" class="form-control-file" accept=".xls, .xlsx, .csv" required>
+            </div>
+
+            <button type="submit" class="btn btn-custom">Upload</button>
+        </form>
+    </div>
+    <script>
+        function logout() {
+            window.location.href = "/";
+        }
+
+        function home() {
+            window.location.href = "/superadminpanel";
+        }
+
+        function back() {
+            history.back();
+        }
+
+        function next() {
+            history.forward();
+        }
+
+        function toggleSubElectionDropdown() {
+            const databaseSelect = document.getElementById('database');
+            const subElectionDiv = document.getElementById('sub-election-type');
+
+            if (databaseSelect.value === 'Vidhan_Parishad') {
+                subElectionDiv.style.display = 'block';
+            } else {
+                subElectionDiv.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', toggleSubElectionDropdown);
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

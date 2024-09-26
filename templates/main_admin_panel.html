@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create admin</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        h1, p {
+            text-align: center;
+            color: #333;
+        }
+        .btn-custom {
+            background-color: #FF4500;
+            color: white;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: darkorange;
+        }
+        .link-right {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 14px;
+            color: rgb(18, 18, 247);
+        }
+        .success-message {
+            color: green;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .gradient-button {
+            background: linear-gradient(to right, red, #ffd000);
+            border: none;
+        }
+        .gradient-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+    <div class="container">
+        <a href="{{ url_for('view_superadmin_admin') }}" class="link-right">Admin List</a>
+        <br>
+        <div class="col-12 d-flex justify-content-between">
+            <div>
+                <button class="btn btn-custom d-none d-md-inline-block" onclick="back()">Back</button>
+                <button class="btn btn-custom d-none d-md-inline-block" onclick="next()">Next</button>
+            </div>
+            <button class="btn btn-custom" onclick="logout()">Logout</button>
+        </div>
+        <h1>Welcome to the Main Admin Panel</h1>
+        <p>Here you can manage the system with Main Admin privileges.</p>
+
+        <h2 class="text-center mb-4">Create admin</h2>
+
+        {% if error_message %}
+            <p class="error-message">{{ error_message }}</p>
+        {% endif %}
+
+        {% if success_message %}
+            <p class="success-message">{{ success_message }}</p>
+        {% endif %}
+
+        <form id="signup-form" action="/create_superadmin" method="post">
+            <div class="mb-3">
+                <input type="text" name="username" placeholder="Username" required class="form-control">
+            </div>
+            <div class="mb-3">
+                <input type="password" name="password" placeholder="Password" required class="form-control">
+            </div>
+            <div class="mb-3">
+                <input type="email" name="email" placeholder="Email" required class="form-control">
+            </div>
+
+            <input type="submit" value="Create admin" class="btn gradient-button mt-4 w-100">
+        </form>
+    </div>
+    <script>
+        function logout() {
+            window.location.href = "/";
+        }
+
+        function back() {
+            history.back();
+        }
+
+        function next() {
+            history.forward();
+        }
+
+        // Redirect to view_superadmin_admin after successful creation
+        document.getElementById('signup-form').onsubmit = function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Assume form submission is handled correctly by the server
+            // You may want to handle this with AJAX or a similar method
+
+            // Redirect to the admin list page after form submission
+            window.location.href = "{{ url_for('view_superadmin_admin') }}";
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, maximum-scale=1, user-scalable=no">
+    <title>View Row</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+
+        .gradient-button {
+            background: linear-gradient(to right, red, #ffd000);
+            border: none;
+        }
+
+        .gradient-button:hover {
+            background-color: #45a049;
+        }
+
+        .custom-orange-btn {
+            background-color: #FE9509;
+            border: none;
+            color: white;
+            margin-right: 10px; /* Adjusting the spacing between buttons */
+        }
+
+        .custom-orange-btn:last-child {
+            margin-right: 0; /* No margin for the last button */
+        }
+
+        .custom-orange-btn:hover {
+            background-color: darken(#FE9509, 10%);
+        }
+
+        .form-check-input:checked {
+            background-color: #FE9509;
+            border-color: #FE9509;
+        }
+
+        .fire-line {
+            height: 10px;
+            background: linear-gradient(to right, red, #ffd000);
+            width: 100%;
+            position: fixed;
+            top: 0;
+            z-index: 2;
+        }
+
+        .main-content {
+            padding: 20px;
+            margin-left: 250px;
+            transition: margin-left 0.3s ease;
+            margin-top: 40px;
+        }
+
+        .custom-orange-btn {
+            background-color: #FF4500;
+            color: #fff;
+        }
+
+        .custom-orange-btn:hover {
+            background-color: #FF5722;
+        }
+
+        @media (max-width: 991px) {
+            #navbar {
+                transform: translateX(-100%);
+            }
+            #toggle-btn {
+                display: block;
+            }
+            #navbar.active {
+                transform: translateX(0);
+            }
+            .desktop-only {
+                display: none;
+            }
+            .mobile-btn-group {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 1rem;
+            }
+        }
+
+        @media print {
+            .print-hide {
+                display: none;
+            }
+        }
+
+        .row-data-title {
+            margin-top: 1px; /* Minimal top margin to pull it closer */
+        }
+
+        /* Add space between labels and input fields */
+        label {
+            margin-bottom: 0.5rem; /* Adjust the margin as needed */
+        }
+
+        .form-control,
+        .form-select {
+            margin-bottom: 0.5rem; /* Adjust the margin as needed */
+            width: 50%; /* Decrease width to 50% */
+            padding: 0.5rem; /* Add some padding for better usability */
+            box-sizing: border-box; /* Ensure padding does not affect width calculation */
+            background-color: #fff; /* Make all input fields white */
+        }
+
+        .form-control[readonly] {
+            background-color: #fff; /* Ensure readonly fields are white */
+        }
+
+        .form-group {
+            margin-bottom: 1rem; /* Add space between form groups */
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-12 d-flex justify-content-between button-group mobile-btn-group d-md-none">
+                    <button onclick="home();" class="btn custom-orange-btn">Home</button>
+                    <button onclick="logout();" class="btn custom-orange-btn">Logout</button>
+                </div>
+                <div class="col-md-8 d-flex justify-content-start button-group d-none d-md-flex">
+                    <button onclick="home();" class="btn custom-orange-btn">Home</button>
+                    <button onclick="back();" class="btn custom-orange-btn">Back</button>
+                    <button onclick="next();" class="btn custom-orange-btn">Next</button>
+                </div>
+                <div class="col-md-4 d-flex justify-content-end d-none d-md-flex">
+                    <button onclick="logout();" class="btn custom-orange-btn">Logout</button>
+                </div>
+            </div>
+            <div id="google_translate_element"></div>
+            <div class="row justify-content-center">
+                <h2 class="mb-0 row-data-title">Row Data</h2>
+            </div>
+        </div>
+        <div class="card-body">
+            <form id="rowDataForm" action="/update_row" method="POST">
+                <!-- Conditionally render Vote_Status -->
+                {% if 'Vote_Status' in row_data %}
+                <div class="form-group">
+                    <label for="Vote_Status">Vote Status</label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="Vote_Status" id="voteDone" value="Vote Done" {% if row_data.Vote_Status == "Vote Done" %}checked{% endif %}>
+                            <label class="form-check-label" for="voteDone">Vote Done</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="Vote_Status" id="notDone" value="Not Done" {% if row_data.Vote_Status == "Not Done" %}checked{% endif %}>
+                            <label class="form-check-label" for="notDone">Not Done</label>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Conditionally render DeadAlive -->
+                {% if 'DeadAlive' in row_data %}
+                <div class="form-group">
+                    <label for="DeadAlive">DeadAlive</label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="DeadAlive" id="dead" value="Dead" {% if row_data.DeadAlive == "Dead" %}checked{% endif %}>
+                            <label class="form-check-label" for="dead">Dead</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="DeadAlive" id="alive" value="Alive" {% if row_data.DeadAlive == "Alive" %}checked{% endif %}>
+                            <label class="form-check-label" for="alive">Alive</label>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Iterate over row_data keys and values to populate form fields -->
+                {% for key, value in row_data.items() %}
+                    {% if key != 'Vote_Status' and key != 'DeadAlive' and key != 'Color' and  key != 'Part_SrNo' and key != 'Original_OCR_SNo' %}
+                        <div class="form-group">
+                            <label for="{{ key }}">{{ key }}</label>
+                            <input type="text" class="form-control" id="{{ key }}" name="{{ key }}" value="{{ value }}"
+                            {% if key in ['SrNo', 'Constituency', 'Section_No_and_Name', 'No_and_Name_of_Polling_Station', 'Address_of_Polling_Station', 'Part_No', 'Name', 'Relative_Name', 'Surname', 'Relation', 'Age', 'Gender', 'EPIC_No', 'Ward'] %}readonly{% endif %}>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Conditionally render Color dropdown field at the end -->
+                {% if 'Color' in row_data %}
+                <div class="form-group">
+                    <label for="Color">Color</label>
+                    <select class="form-select" id="Color" name="Color">
+                        <option value="Black" {% if row_data.Color == 'Black' %}selected{% endif %}>Black</option>
+                        <option value="Green" {% if row_data.Color == 'Green' %}selected{% endif %}>Green</option>
+                        <option value="Red" {% if row_data.Color == 'Red' %}selected{% endif %}>Red</option>
+                        <option value="Yellow" {% if row_data.Color == 'Yellow' %}selected{% endif %}>Yellow</option>
+                        <option value="Blue" {% if row_data.Color == 'Blue' %}selected{% endif %}>Blue</option>
+                    </select>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+        <div class="card-footer d-flex justify-content-start">
+            <button type="submit" form="rowDataForm" class="btn gradient-button">Update</button>
+        </div>
+    </div>
+</div>
+<script>
+
+    function home() {
+        console.log("Navigating to home...");
+        window.location.href = "/display_index";
+    }
+
+    function back() {
+        history.back();
+    }
+
+    function next() {
+        history.forward();
+    }
+
+    function logout() {
+        console.log("Logging out...");
+        window.location.href = "/";
+    }
+
+    function googleTranslateElementInit() {
+    var preferredLanguage = localStorage.getItem('preferredLanguage') || 'en'; // Default to English if not set
+    new google.translate.TranslateElement(
+        { pageLanguage: preferredLanguage },
+        'google_translate_element'
+    );
+}
+
+    </script>
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<!-- Include Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
